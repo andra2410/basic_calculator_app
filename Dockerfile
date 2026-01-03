@@ -1,35 +1,15 @@
-#Base PHP image
-FROM php:8.4-fpm
+FROM php:8.4-fpm //this is the base image for the application
 
-#working directory
-WORKDIR /var/www/html
+WORKDIR /var/www/html //this is the working directory for the application
 
-#system dependencies 
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    zip \
-    libzip-dev \
-    && docker-php-ext-install zip \
-    && rm -rf /var/lib/apt/lists/*
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer //this will copy the composer binary from the composer image to the working directory
 
-#Composer from official image
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY . . //this will copy the entire project to the working directory
 
-#Copy project files
-COPY . .
+RUN composer install //this will install the dependencies for the application
 
-#PHP dependencies
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN php artisan key:generate //this will generate a random key for the application
 
-#Laravel application key
-RUN php artisan key:generate
+RUN php artisan migrate //this will create the tables in the database
 
-#pt migrations
-RUN php artisan migrate --force
-
-# expose port
-EXPOSE 8000
-
-# start server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"] //this will start the application
