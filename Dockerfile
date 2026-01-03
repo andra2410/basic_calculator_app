@@ -1,15 +1,35 @@
-FROM php:8.4-fpm 
+#Base PHP image
+FROM php:8.4-fpm
 
-WORKDIR /var/www/html 
+#working directory
+WORKDIR /var/www/html
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer 
+#system dependencies 
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    zip \
+    libzip-dev \
+    && docker-php-ext-install zip \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY . . 
+#Composer from official image
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-RUN composer install
+#Copy project files
+COPY . .
 
-RUN php artisan key:generate 
+#PHP dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-RUN php artisan migrate 
+#Laravel application key
+RUN php artisan key:generate
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"] 
+#pt migrations
+RUN php artisan migrate --force
+
+# expose port
+EXPOSE 8000
+
+# start server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
