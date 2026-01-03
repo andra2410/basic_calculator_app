@@ -45,7 +45,7 @@
 
 		.history-button {
 			width: 100%;
-			max-width: 400px;
+			max-width: 200px;
 			padding: 15px 30px;
 			background-color:rgb(255, 0, 166);
 			color: white;
@@ -183,13 +183,15 @@
 
 		/* Set a style for all buttons */
 		.modal button {
-			background-color: #04AA6D;
+			background-color:rgb(198, 144, 182);
 			color: white;
 			padding: 14px 20px;
 			margin: 8px 0;
 			border: none;
 			cursor: pointer;
 			width: 100%;
+			
+		
 		}
 
 		.modal button:hover {
@@ -529,7 +531,7 @@
 						html += `
 							<div class="user-item">
 								<span class="user-username">${user.username}</span>
-								<button class="add-friend-btn" onclick="addFriend(${user.id}, '${username}')">Add</button>
+								<button class="add-friend-btn" style="max-width: 200px; onclick="addFriend(${user.id}, '${username}')">Add</button>
 							</div>
 						`;
 					});
